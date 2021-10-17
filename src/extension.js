@@ -40,7 +40,7 @@
 	const GLib = imports.gi.GLib;
 	const GObject = imports.gi.GObject;
 	
-    const Colors=["000000","FF0000","00FF00","0000FF","FFFF00","FF00FF","00FFFF","FFFFFF"]
+    const Colors=["000000","000000","000000","000000","FF0000","00FF00","0000FF","FFFF00","FF00FF","00FFFF","FFFFFF","000000","FF0000","00FF00","0000FF","FFFF00","FF00FF","00FFFF","FFFFFF"]
 	const ExtensionUtils = imports.misc.extensionUtils;
 	const Me = ExtensionUtils.getCurrentExtension();
 	
@@ -92,14 +92,14 @@
 
 			// Submenu item
 			let rightmenuitem = new PopupMenu.PopupImageMenuItem('R', 'format-justify-left-symbolic');		
-			let centermenuitem = new PopupMenu.PopupImageMenuItem('C', 'format-justify-fill-symbolic');	
-			let leftmenuitem = new PopupMenu.PopupImageMenuItem('L', 'format-justify-right-symbolic');	
+			let centermenuitem = new PopupMenu.PopupImageMenuItem('G', 'format-justify-fill-symbolic');	
+			let leftmenuitem = new PopupMenu.PopupImageMenuItem('B', 'format-justify-right-symbolic');	
 
-			slider1 = new Slider.Slider(rs/7);
+			slider1 = new Slider.Slider(rs/15);
 			rightmenuitem.add(slider1, {expand: false});
-			slider2 = new Slider.Slider(cs/7);
+			slider2 = new Slider.Slider(cs/15);
 			centermenuitem.add(slider2, {expand: true});
-			slider3 = new Slider.Slider(ls/7);
+			slider3 = new Slider.Slider(ls/15);
 			leftmenuitem.add(slider3, {expand: true});
 
 			popupMenuExpander.menu.addMenuItem(rightmenuitem);
@@ -119,7 +119,7 @@
 
 			// Slider color general
 			let colorMain = new PopupMenu.PopupMenuItem('');
-			sliderMain = new Slider.Slider(ms/7);
+			sliderMain = new Slider.Slider(ms/15);
 			
 			/*for(var a in imports.ui){
 				log(a);
@@ -203,7 +203,7 @@
 		// Hide Submenu
 		_closeSubmenu();
 		let old=ms;
-		ms=Math.round(sliderMain.value*7); 
+		ms=Math.round(sliderMain.value*15); 
 		
 		slider1.value=sliderMain.value;
 		slider2.value=sliderMain.value;
@@ -232,7 +232,7 @@
 	function _onSlider1Changed() {
 		// Change color Right
 		let old=rs;
-		rs=Math.round(slider1.value*7);
+		rs=Math.round(slider1.value*15);
 		if (ms_permission){
 			_openSubmenu();
 			if(old!=rs){
@@ -249,7 +249,7 @@
 	function _onSlider2Changed() {
 		// Change color Center
 		let old=cs;
-		cs=Math.round(slider2.value*7);
+		cs=Math.round(slider2.value*15);
 		if (ms_permission){
 			_openSubmenu();
 			if(old!=cs){
@@ -266,7 +266,7 @@
 	function _onSlider3Changed() {
 		// Change color Left
 		let old=ls;
-		ls=Math.round(slider3.value*7);
+		ls=Math.round(slider3.value*15);
 		if (ms_permission){
 			_openSubmenu();
 			if(old!=ls){
@@ -306,7 +306,7 @@
 	function _ApplyBrightness(){
 		let brightness = ''+bs;
 		log(brightness);
-		let directoryPath='/sys/devices/platform/tuxedo_keyboard/';
+		let directoryPath='/sys/devices/platform/clevo_keyboard/';
 		directory = Gio.File.new_for_path(directoryPath);
 
   		if (!directory.query_exists(null)) {
@@ -319,10 +319,29 @@
 		}
 	}
 	
+	function convertToHex(num) {
+		switch (num) {
+			case 15:
+				return "F";
+			case 14:
+				return "E";
+			case 13:
+				return "D";
+			case 12:
+				return "C";
+			case 11:
+				return "B";
+			case 10:
+				return "A";
+			default:
+				return num.toString();
+		}
+	}
+	
 	// Write on files
 	function _ApplyColors(){
 		if(ms_permission){
-			let directoryPath='/sys/devices/platform/tuxedo_keyboard/';
+			let directoryPath='/sys/devices/platform/clevo_keyboard/';
 			
 			directory = Gio.File.new_for_path(directoryPath);
 
@@ -330,19 +349,23 @@
     				log('Errore la directory non esiste');
 			}else{
 				let filePath = GLib.build_filenamev([directoryPath, "color_left"]);
-				let args = ["sh", "-c","echo "+ "\"0x" + Colors[ls] +"\"" + " > "+"\"" +filePath+"\"" +" "];
+				let colorTransferR = convertToHex(rs) + convertToHex(rs);
+				let colorTransferG = convertToHex(cs) + convertToHex(cs);
+				let colorTransferB = convertToHex(ls) + convertToHex(ls);
+				let colorTransfer = colorTransferR + colorTransferG + colorTransferB;
+				let args = ["sh", "-c","echo "+ "\"0x" + colorTransfer +"\"" + " > "+"\"" +filePath+"\"" +" "];
 				log(ls);
 				log(args.join(" "));
 				GLib.spawn_sync(null, args, null, GLib.SpawnFlags.SEARCH_PATH, null);
 
 				filePath = GLib.build_filenamev([directoryPath, "color_center"]);
-				args = ["sh", "-c","echo "+ "\"0x" + Colors[cs] +"\"" + " > "+"\"" +filePath+"\"" +" "];
+				args = ["sh", "-c","echo "+ "\"0x" + Colors[0] +"\"" + " > "+"\"" +filePath+"\"" +" "];
 				log(cs);
 				log(args.join(" "));
 				GLib.spawn_sync(null, args, null, GLib.SpawnFlags.SEARCH_PATH, null);
 
 				filePath = GLib.build_filenamev([directoryPath, "color_right"]);
-				args = ["sh", "-c","echo "+ "\"0x" + Colors[rs] +"\"" + " > "+"\"" +filePath+"\"" +" "];
+				args = ["sh", "-c","echo "+ "\"0x" + Colors[0] +"\"" + " > "+"\"" +filePath+"\"" +" "];
 				log(rs);
 				log(args.join(" "));
 				GLib.spawn_sync(null, args, null, GLib.SpawnFlags.SEARCH_PATH, null);

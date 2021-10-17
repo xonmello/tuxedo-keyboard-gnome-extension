@@ -28,3 +28,8 @@ Note: It is at your own risk! With this operation everbody can write to your tux
 
 Alt+F2 and r and Enter.
 
+# Modifications
+
+Switched the controls from Right, Center, Left sliders to RGB values. Can no longer control them individually but my keyboard and I am sure many others don't support that anyways. Each slider has 15 levels of color.
+
+RGB controls are low key cooler anyway ;)
